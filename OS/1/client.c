@@ -136,11 +136,6 @@ int main(int argc, char **argv) {
 
             close(pipe1[1]);
             close(pipe2[1]);
-
-            waitpid(child1, NULL, 0);
-            waitpid(child2, NULL, 0);
-
-            printf("The parent process is completed.\n");
         } break;
         }
     } break;

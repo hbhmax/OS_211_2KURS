@@ -12,16 +12,22 @@ int is_vowel(char c) {
     return (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'y');
 }
 
-void remove_vowels(char *str, ssize_t length) {
+ssize_t remove_vowels(char *str, ssize_t length) {
     char *src = str;
     char *dst = str;
+    ssize_t res_len = length;
     
     for (ssize_t i = 0; i < length; i++) {
         if (!is_vowel(*src)) {
             *dst++ = *src;
         }
+        else {
+            res_len--;
+        }
         src++;
     }
+
+    return res_len;
 }
 
 int main(int argc, char **argv) {
@@ -44,16 +50,10 @@ int main(int argc, char **argv) {
             exit(EXIT_FAILURE);
         }
 
-        remove_vowels(buf, bytes);
+        ssize_t res_bytes = remove_vowels(buf, bytes);
 
-        int32_t written = write(file, buf, bytes);
-        if (written != bytes) {
-            const char msg[] = "error: failed to write to file\n";
-            write(STDERR_FILENO, msg, sizeof(msg));
-            exit(EXIT_FAILURE);
-        }
+        write(file, buf, res_bytes);
     }
-
     close(file);
     return 0;
 }
