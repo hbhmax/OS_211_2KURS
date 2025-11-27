@@ -1,33 +1,14 @@
-CC = gcc
-CFLAGS = -Wall -fPIC -Iinclude
-LDFLAGS = -ldl
+do_so:
+	gcc -shared -fPIC -I./include -o src/libown1.so src/lib1.c -lm
+	gcc -shared -fPIC -I./include -o src/libown2.so src/lib2.c -lm
 
-all: libs programs
+comp_stat:
+	gcc -I./include example_static.c -L./src -lown1 -Wl,-rpath,./src -o example_static -lm
 
-libs: libpi_leibniz.so libpi_wallis.so
-
-libpi_leibniz.so: src/pi_leibniz.c include/pi_lib.h
-	$(CC) $(CFLAGS) -c src/pi_leibniz.c -o pi_leibniz.o
-	$(CC) -shared -o libpi_leibniz.so pi_leibniz.o
-
-libpi_wallis.so: src/pi_wallis.c include/pi_lib.h
-	$(CC) $(CFLAGS) -c src/pi_wallis.c -o pi_wallis.o
-	$(CC) -shared -o libpi_wallis.so pi_wallis.o
-
-programs: test_static test_dynamic
-
-test_static: test_static.c include/pi_lib.h libpi_leibniz.so
-	$(CC) test_static.c -L. -lpi_leibniz -o test_static $(LDFLAGS)
-
-test_dynamic: test_dynamic.c include/pi_lib.h
-	$(CC) test_dynamic.c -o test_dynamic $(LDFLAGS)
-
-run:
-	LD_LIBRARY_PATH=. ./test_static
-	LD_LIBRARY_PATH=. ./test_dynamic
+comp_dyn:
+	gcc -I./include example_dynamic.c -ldl -o example_dynamic
 
 clean:
-	rm -f *.o *.so test_static test_dynamic
-	@echo "Очищено"
+	rm -f src/*.so example_static example_dynamic
 
-.PHONY: all libs programs run clean
+all: do_so comp_stat comp_dyn
